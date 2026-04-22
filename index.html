@@ -1,33 +1,646 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Sex">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Sex</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0f172a; padding: 16px 12px; }
+        .container { width: 100%; margin: 0; padding: 0; }
+        .tabs { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+        .tab-btn { background: #334155; border: none; padding: 28px 20px; font-size: 34px; font-weight: bold; text-align: center; border-radius: 30px; color: #e2e8f0; cursor: pointer; width: 100%; }
+        .tab-btn.active { background: #3b82f6; color: white; }
+        .panel { display: none; background: #1e293b; border-radius: 40px; padding: 28px 20px; margin-bottom: 24px; }
+        .panel.active { display: block; }
+        .section-title { font-size: 38px; font-weight: bold; margin-bottom: 28px; color: #facc15; border-left: 8px solid #facc15; padding-left: 20px; }
+        .info-card { background: #0f172a; border-radius: 30px; padding: 24px 20px; margin-bottom: 28px; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
+        .info-label { color: #94a3b8; font-weight: 500; font-size: 28px; }
+        .info-value { color: #38bdf8; font-weight: bold; font-size: 32px; }
+        .build-card, .research-card { background: #0f172a; border-radius: 35px; padding: 28px 20px; margin-bottom: 24px; text-align: center; border: 2px solid #334155; }
+        .card-title { font-size: 34px; font-weight: bold; background: #f59e0b; color: #0c0a2a; display: inline-block; padding: 12px 30px; border-radius: 50px; margin-bottom: 25px; }
+        .time-group { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .time-unit { text-align: center; flex: 1; min-width: 90px; }
+        .time-unit span { display: block; font-size: 24px; color: #94a3b8; margin-bottom: 10px; font-weight: 600; }
+        .time-input { width: 100%; padding: 22px 12px; font-size: 34px; text-align: center; background: #1e293b; border: 2px solid #475569; border-radius: 20px; color: white; font-weight: bold; }
+        .squad-card { background: #0f172a; border-radius: 35px; padding: 28px 20px; margin-bottom: 24px; text-align: center; border: 2px solid #334155; }
+        .squad-label { font-size: 34px; font-weight: bold; color: #a78bfa; margin-bottom: 20px; display: block; }
+        .squad-input { width: 100%; padding: 28px 20px; font-size: 38px; text-align: center; background: #1e293b; border: 2px solid #475569; border-radius: 25px; color: white; font-weight: bold; }
+        .stat-card { background: #0f172a; border-radius: 35px; padding: 28px 20px; margin-bottom: 24px; text-align: center; border: 2px solid #334155; }
+        .stat-label { font-size: 34px; font-weight: bold; margin-bottom: 20px; display: block; }
+        .stat-input { width: 100%; padding: 28px 20px; font-size: 38px; text-align: center; background: #1e293b; border: 2px solid #475569; border-radius: 25px; color: white; }
+        .btn { width: 100%; padding: 28px 20px; font-size: 34px; font-weight: bold; border: none; border-radius: 60px; color: white; cursor: pointer; margin-top: 20px; text-align: center; }
+        .btn-blue { background: #3b82f6; }
+        .btn-orange { background: #f59e0b; }
+        .btn-red { background: #ef4444; }
+        .btn-gray { background: #475569; }
+        .input-field { width: 100%; padding: 28px 24px; font-size: 34px; background: #1e293b; border: 2px solid #475569; border-radius: 25px; color: white; margin-bottom: 20px; }
+        .input-field::placeholder { font-size: 30px; }
+        .rating-table { width: 100%; border-collapse: collapse; }
+        .rating-table th, .rating-table td { padding: 18px 10px; text-align: left; border-bottom: 2px solid #334155; color: #e2e8f0; }
+        .rating-table th { background: #0f172a; font-weight: bold; color: #facc15; font-size: 28px; }
+        .rating-table td { font-size: 26px; }
+        .sort-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
+        .sort-btn { background: #334155; border: none; padding: 22px 12px; border-radius: 50px; font-size: 26px; font-weight: bold; color: #e2e8f0; cursor: pointer; text-align: center; }
+        .sort-btn.active { background: #3b82f6; color: white; }
+        hr { margin: 30px 0; border-color: #334155; border-width: 2px; }
+        .status { padding: 24px; margin-top: 20px; border-radius: 25px; display: none; text-align: center; font-size: 28px; font-weight: bold; }
+        .status.success { background: #065f46; color: #a7f3d0; display: block; }
+        .status.error { background: #991b1b; color: #fecaca; display: block; }
+        .top-list-item { padding: 18px 0; border-bottom: 2px solid #334155; display: flex; justify-content: space-between; font-size: 28px; font-weight: 500; color: #e2e8f0; }
+        .admin-row { display: flex; flex-direction: column; gap: 18px; margin-bottom: 24px; }
+        .login-card { background: #0f172a; border-radius: 45px; padding: 40px 25px; }
+        .login-title { font-size: 52px; font-weight: bold; color: #facc15; margin-bottom: 45px; text-align: center; }
+        .checkbox-label { font-size: 28px; color: #e2e8f0; margin-left: 15px; }
+        .checkbox { width: 32px; height: 32px; transform: scale(1.2); }
+        .error-text { font-size: 26px; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { opacity: 0.5; height: 40px; }
+        .panel, .build-card, .squad-card, .stat-card { will-change: transform; }
+        * { -webkit-overflow-scrolling: touch; }
+        .rating-table td { padding: 12px 8px; border-bottom: 1px solid #334155; }
+    </style>
 </head>
 <body>
-    <h1>Sex</h1>
-    <input type="text" id="user" placeholder="Логин">
-    <input type="password" id="pass" placeholder="Пароль">
-    <button onclick="doLogin()">Войти</button>
-    <div id="result"></div>
+<div class="container">
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-title">🔐 ВХОД</div>
+            <input type="text" id="loginUser" class="input-field" placeholder="ЛОГИН">
+            <input type="password" id="loginPass" class="input-field" placeholder="ПАРОЛЬ">
+            <div style="display: flex; align-items: center; gap: 15px; margin: 25px 0;">
+                <input type="checkbox" id="rememberMe" class="checkbox">
+                <label class="checkbox-label">ЗАПОМНИТЬ МЕНЯ</label>
+            </div>
+            <button class="btn btn-blue" onclick="doLogin()">ВОЙТИ</button>
+            <div id="loginError" style="color: #f87171; margin-top: 30px; text-align: center; font-size: 28px;"></div>
+        </div>
+    </div>
 
-    <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyCpxiZ3MOjwMUsPX8zuihHEkLobi2Nlc5GpW-eaQX9A7ufDuo-DcbSweL1V5c2aMFprw/exec';
-        
-        async function doLogin() {
-            var username = document.getElementById('user').value;
-            var password = document.getElementById('pass').value;
-            
-            const url = API_URL + '?action=login&username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password);
-            
-            try {
-                const response = await fetch(url);
-                const result = await response.json();
-                document.getElementById('result').innerText = JSON.stringify(result);
-            } catch(e) {
-                document.getElementById('result').innerText = 'Ошибка: ' + e;
-            }
+    <div id="mainScreen" style="display: none;">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="tab1">📝 ВВОД ДАННЫХ</button>
+            <button class="tab-btn" data-tab="tab2" id="adminTab" style="display: none;">👑 АДМИН</button>
+            <button class="tab-btn" data-tab="tab3">🏆 РЕЙТИНГ</button>
+        </div>
+
+        <div id="tab1" class="panel active">
+            <div class="section-title">📊 ИНФОРМАЦИЯ</div>
+            <div class="info-card">
+                <div class="info-row"><span class="info-label">🏗️ Стройка место:</span><span class="info-value" id="queueBuild">-</span></div>
+                <div class="info-row"><span class="info-label">⚡ Бафов стройка:</span><span class="info-value" id="buffBuild">-</span></div>
+                <div class="info-row"><span class="info-label">⏱️ Стройка 1:</span><span class="info-value" id="timeLeftBuild1">-</span></div>
+                <div class="info-row"><span class="info-label">⏱️ Стройка 2:</span><span class="info-value" id="timeLeftBuild2">-</span></div>
+                <div class="info-row"><span class="info-label">⏱️ Стройка 3:</span><span class="info-value" id="timeLeftBuild3">-</span></div>
+                <div class="info-row" style="margin-top: 20px;"><span class="info-label">🔬 Исслед. место:</span><span class="info-value" id="queueResearch">-</span></div>
+                <div class="info-row"><span class="info-label">⚡ Бафов исслед.:</span><span class="info-value" id="buffResearch">-</span></div>
+                <div class="info-row"><span class="info-label">⏱️ Исслед. 1:</span><span class="info-value" id="timeLeftResearch1">-</span></div>
+                <div class="info-row"><span class="info-label">⏱️ Исслед. 2:</span><span class="info-value" id="timeLeftResearch2">-</span></div>
+            </div>
+
+            <div class="build-card"><div class="card-title">🏗️ СТРОЙКА 1</div><div class="time-group"><div class="time-unit"><span>ДНИ</span><input type="number" id="b1d" class="time-input" value=""></div><div class="time-unit"><span>ЧАСЫ</span><input type="number" id="b1h" class="time-input" value=""></div><div class="time-unit"><span>МИН</span><input type="number" id="b1m" class="time-input" value=""></div></div></div>
+            <div class="build-card"><div class="card-title">🏗️ СТРОЙКА 2</div><div class="time-group"><div class="time-unit"><span>ДНИ</span><input type="number" id="b2d" class="time-input" value=""></div><div class="time-unit"><span>ЧАСЫ</span><input type="number" id="b2h" class="time-input" value=""></div><div class="time-unit"><span>МИН</span><input type="number" id="b2m" class="time-input" value=""></div></div></div>
+            <div class="build-card"><div class="card-title">🏗️ СТРОЙКА 3</div><div class="time-group"><div class="time-unit"><span>ДНИ</span><input type="number" id="b3d" class="time-input" value=""></div><div class="time-unit"><span>ЧАСЫ</span><input type="number" id="b3h" class="time-input" value=""></div><div class="time-unit"><span>МИН</span><input type="number" id="b3m" class="time-input" value=""></div></div></div>
+            <div class="research-card"><div class="card-title">🔬 ИССЛЕДОВАНИЕ 1</div><div class="time-group"><div class="time-unit"><span>ДНИ</span><input type="number" id="r1d" class="time-input" value=""></div><div class="time-unit"><span>ЧАСЫ</span><input type="number" id="r1h" class="time-input" value=""></div><div class="time-unit"><span>МИН</span><input type="number" id="r1m" class="time-input" value=""></div></div></div>
+            <div class="research-card"><div class="card-title">🔬 ИССЛЕДОВАНИЕ 2</div><div class="time-group"><div class="time-unit"><span>ДНИ</span><input type="number" id="r2d" class="time-input" value=""></div><div class="time-unit"><span>ЧАСЫ</span><input type="number" id="r2h" class="time-input" value=""></div><div class="time-unit"><span>МИН</span><input type="number" id="r2m" class="time-input" value=""></div></div></div>
+
+            <div class="squad-card"><span class="squad-label">⚔️ ОТРЯД 1 (млн)</span><input type="text" id="squad1" class="squad-input" placeholder="0"></div>
+            <div class="squad-card"><span class="squad-label">⚔️ ОТРЯД 2 (млн)</span><input type="text" id="squad2" class="squad-input" placeholder="0"></div>
+            <div class="squad-card"><span class="squad-label">⚔️ ОТРЯД 3 (млн)</span><input type="text" id="squad3" class="squad-input" placeholder="0"></div>
+
+            <div class="stat-card"><span class="stat-label" style="color: #fbbf24;">⚡ ЭЛЕКТРОСТАНЦИЯ</span><input type="text" id="station" class="stat-input" placeholder="0"></div>
+            <div class="stat-card"><span class="stat-label" style="color: #fbbf24;">💎 VIP УРОВЕНЬ</span><input type="text" id="vip" class="stat-input" placeholder="0"></div>
+            <div class="stat-card"><span class="stat-label" style="color: #10b981;">🔄 РЕЛОКАТОРЫ</span><input type="text" id="relocator" class="stat-input" placeholder="0"></div>
+
+            <hr>
+            <input type="password" id="newPwd" class="input-field" placeholder="НОВЫЙ ПАРОЛЬ">
+            <input type="password" id="confirmPwd" class="input-field" placeholder="ПОВТОРИТЕ">
+            <button class="btn btn-orange" onclick="changeMyPassword()">🔑 СМЕНИТЬ ПАРОЛЬ</button>
+            <button class="btn btn-blue" onclick="saveAllData()">💾 СОХРАНИТЬ</button>
+            <p style="font-size: 24px; color: #94a3b8; text-align: center; margin-top: 25px;">Точка (.) или запятая (,) — заменятся</p>
+        </div>
+
+        <div id="tab2" class="panel">
+            <div class="section-title">👑 УПРАВЛЕНИЕ</div>
+            <input type="text" id="targetNick" class="input-field" placeholder="👤 НИК ИГРОКА" list="usersList">
+            <div class="admin-row"><button class="btn btn-red" onclick="clearBuild()">🗑️ ОЧИСТИТЬ СТРОЙКУ</button><button class="btn btn-red" onclick="clearResearch()">🗑️ ОЧИСТИТЬ ИССЛЕД.</button></div>
+            <hr>
+            <div class="admin-row" style="margin-bottom: 20px;"><label style="display: flex; align-items: center; gap: 15px; font-size: 28px;"><input type="checkbox" id="dailyLimitCheckbox" style="width: 32px; height: 32px;" onchange="toggleDailyLimit()">🔒 Ограничить сохранение стройки/исследования (1 раз в день)</label></div>
+            <div class="admin-row"><input type="text" id="pwdNick" class="input-field" placeholder="👤 НИК" list="usersList"><input type="password" id="newUserPwd" class="input-field" placeholder="🔑 НОВЫЙ ПАРОЛЬ"></div>
+            <button class="btn btn-orange" onclick="changeUserPassword()">🔑 СМЕНИТЬ ПАРОЛЬ</button>
+            <hr>
+            <div class="admin-row"><input type="text" id="oldNick" class="input-field" placeholder="📝 СТАРЫЙ НИК" list="usersList"><input type="text" id="newNickName" class="input-field" placeholder="✨ НОВЫЙ НИК"></div>
+            <button class="btn btn-orange" onclick="replacePlayerNick()">🔄 ЗАМЕНИТЬ ИГРОКА</button>
+            <hr>
+            <input type="text" id="adminNick" class="input-field" placeholder="👤 НИК" list="usersList">
+            <div class="admin-row"><button class="btn btn-orange" onclick="makeUserAdmin()">⭐ СДЕЛАТЬ АДМИНОМ</button><button class="btn btn-red" onclick="removeUserAdmin()">❌ УБРАТЬ АДМИНА</button></div>
+            <hr>
+            <div class="admin-row"><input type="number" id="buildBuff" class="input-field" placeholder="⏱️ БАФ СТРОЙКИ (МИН)"><input type="number" id="researchBuff" class="input-field" placeholder="⏱️ БАФ ИССЛЕД. (МИН)"></div>
+            <div class="admin-row"><button class="btn btn-orange" onclick="saveBuildBuffTime()">💾 СОХР. БАФ СТРОЙКИ</button><button class="btn btn-orange" onclick="saveResearchBuffTime()">💾 СОХР. БАФ ИССЛЕД.</button></div>
+            <hr>
+            <div class="section-title" style="font-size: 32px;">🏆 ТОП СТРОЙКА</div>
+            <div id="buildTop"></div>
+            <div class="section-title" style="font-size: 32px; margin-top: 35px;">🏆 ТОП ИССЛЕДОВАНИЕ</div>
+            <div id="researchTop"></div>
+            <hr>
+            <div class="section-title" style="font-size: 32px;">📊 СРЕДНИЕ ЗНАЧЕНИЯ</div>
+            <div id="averageStats" class="info-card" style="padding: 20px;">
+                <div class="info-row"><span class="info-label">⚡ Средняя станция:</span><span class="info-value" id="avgStation">-</span></div>
+                <div class="info-row"><span class="info-label">🔄 Средний релокатор:</span><span class="info-value" id="avgRelocator">-</span></div>
+                <div class="info-row"><span class="info-label">💎 Средний VIP:</span><span class="info-value" id="avgVip">-</span></div>
+                <div class="info-row"><span class="info-label">⚔️ Средний отряд 1:</span><span class="info-value" id="avgSquad1">-</span></div>
+                <div class="info-row"><span class="info-label">⚔️ Средний отряд 2:</span><span class="info-value" id="avgSquad2">-</span></div>
+                <div class="info-row"><span class="info-label">⚔️ Средний отряд 3:</span><span class="info-value" id="avgSquad3">-</span></div>
+                <div class="info-row"><span class="info-label">👥 Всего игроков:</span><span class="info-value" id="avgCount">-</span></div>
+            </div>
+            <button class="btn btn-blue" onclick="refreshAdminPanel()" style="margin-top: 25px;">🔄 ОБНОВИТЬ</button>
+        </div>
+
+        <div id="tab3" class="panel">
+            <div class="section-title">🏆 РЕЙТИНГ</div>
+            <div class="sort-buttons">
+                <button class="sort-btn active" data-sort="squad1">ОТРЯД 1</button>
+                <button class="sort-btn" data-sort="squad2">ОТРЯД 2</button>
+                <button class="sort-btn" data-sort="squad3">ОТРЯД 3</button>
+                <button class="sort-btn" data-sort="station">СТАНЦИЯ</button>
+                <button class="sort-btn" data-sort="vip">VIP</button>
+                <button class="sort-btn" data-sort="relocator">РЕЛОКАТОР</button>
+            </div>
+            <div id="ratingList">ЗАГРУЗКА...</div>
+            <button class="btn btn-blue" onclick="loadRatingData()" style="margin-top: 25px;">🔄 ОБНОВИТЬ</button>
+        </div>
+
+        <div id="statusMsg" class="status"></div>
+        <button class="btn btn-gray" onclick="doLogout()">🚪 ВЫЙТИ</button>
+    </div>
+</div>
+
+<datalist id="usersList"></datalist>
+
+<script>
+    // ========== НАСТРОЙКИ ==========
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyCpxiZ3MOjwMUsPX8zuihHEkLobi2Nlc5GpW-eaQX9A7ufDuo-DcbSweL1V5c2aMFprw/exec';
+    
+    var TOKEN = null;
+    var USER_ROLE = null;
+    var CURRENT_USER = null;
+    var RATING_DATA = null;
+    var CURRENT_SORT = 'squad1';
+    var autoInterval = null;
+
+    // Регистрация Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker зарегистрирован', reg))
+            .catch(err => console.log('Ошибка регистрации SW:', err));
+    }
+
+    window.onload = function() {
+        var savedUser = localStorage.getItem('savedUser');
+        var savedPwd = localStorage.getItem('savedPwd');
+        if (savedUser && savedPwd) {
+            document.getElementById('loginUser').value = savedUser;
+            document.getElementById('loginPass').value = savedPwd;
+            document.getElementById('rememberMe').checked = true;
         }
-    </script>
+        loadUsersList();
+    };
+    
+    function showStatus(msg, type) {
+        var div = document.getElementById('statusMsg');
+        div.innerText = msg;
+        div.className = 'status ' + type;
+        setTimeout(() => div.className = 'status', 4000);
+    }
+    
+    async function apiCall(action, params = {}) {
+        const url = new URL(API_URL);
+        url.searchParams.append('action', action);
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+        
+        try {
+            const response = await fetch(url.toString());
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            return { success: false, message: error.toString() };
+        }
+    }
+    
+    async function doLogin() {
+        var username = document.getElementById('loginUser').value.trim();
+        var password = document.getElementById('loginPass').value;
+        var remember = document.getElementById('rememberMe').checked;
+        
+        if (!username || !password) {
+            document.getElementById('loginError').innerText = 'Введите логин и пароль';
+            return;
+        }
+        
+        if (remember) {
+            localStorage.setItem('savedUser', username);
+            localStorage.setItem('savedPwd', password);
+        } else {
+            localStorage.removeItem('savedUser');
+            localStorage.removeItem('savedPwd');
+        }
+        
+        const result = await apiCall('login', { username, password });
+        
+        if (result.success) {
+            TOKEN = result.token;
+            USER_ROLE = result.role;
+            CURRENT_USER = result.username;
+            
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'block';
+            
+            if (USER_ROLE === 'admin') {
+                document.getElementById('adminTab').style.display = 'block';
+                refreshAdminPanel();
+                loadBuffTimes();
+                loadAverageStats();
+                loadDailyLimitStatus();
+            }
+            
+            loadUserData();
+            loadQueueInfo();
+            loadRatingData();
+            
+            if (autoInterval) clearInterval(autoInterval);
+            autoInterval = setInterval(() => {
+                loadQueueInfo();
+                loadRatingData();
+            }, 120000);
+        } else {
+            document.getElementById('loginError').innerText = result.message;
+        }
+    }
+    
+    async function loadUsersList() {
+        const users = await apiCall('getUsersList');
+        var datalist = document.getElementById('usersList');
+        datalist.innerHTML = '';
+        if (users && Array.isArray(users)) {
+            users.forEach(user => {
+                var option = document.createElement('option');
+                option.value = user;
+                datalist.appendChild(option);
+            });
+        }
+    }
+    
+    async function loadUserData() {
+        const data = await apiCall('getUserData', { token: TOKEN });
+        if (data && data.success !== false) {
+            setVal('b1d', data.build1Day);
+            setVal('b1h', data.build1Hour);
+            setVal('b1m', data.build1Minute);
+            setVal('b2d', data.build2Day);
+            setVal('b2h', data.build2Hour);
+            setVal('b2m', data.build2Minute);
+            setVal('b3d', data.build3Day);
+            setVal('b3h', data.build3Hour);
+            setVal('b3m', data.build3Minute);
+            setVal('r1d', data.research1Day);
+            setVal('r1h', data.research1Hour);
+            setVal('r1m', data.research1Minute);
+            setVal('r2d', data.research2Day);
+            setVal('r2h', data.research2Hour);
+            setVal('r2m', data.research2Minute);
+            setVal('squad1', data.squad1);
+            setVal('squad2', data.squad2);
+            setVal('squad3', data.squad3);
+            setVal('station', data.stationLevel);
+            setVal('vip', data.vipLevel);
+            setVal('relocator', data.relocator);
+        }
+    }
+    
+    function setVal(id, val) {
+        var el = document.getElementById(id);
+        if (el && val !== undefined && val !== null) el.value = val;
+    }
+    
+    function getVal(id) {
+        var el = document.getElementById(id);
+        return el ? el.value : '';
+    }
+    
+    async function loadQueueInfo() {
+        const data = await apiCall('getUserQueueInfo', { token: TOKEN });
+        if (data && data.success !== false) {
+            document.getElementById('queueBuild').innerText = data.buildQueue || '-';
+            document.getElementById('buffBuild').innerText = data.buildBuff || '-';
+            document.getElementById('timeLeftBuild1').innerText = data.timeLeftBuild1 || '-';
+            document.getElementById('timeLeftBuild2').innerText = data.timeLeftBuild2 || '-';
+            document.getElementById('timeLeftBuild3').innerText = data.timeLeftBuild3 || '-';
+            document.getElementById('queueResearch').innerText = data.researchQueue || '-';
+            document.getElementById('buffResearch').innerText = data.researchBuff || '-';
+            document.getElementById('timeLeftResearch1').innerText = data.timeLeftResearch1 || '-';
+            document.getElementById('timeLeftResearch2').innerText = data.timeLeftResearch2 || '-';
+        }
+    }
+    
+    function norm(val) {
+        if (val === undefined || val === null || val === '') return '';
+        return val.toString().trim().replace(',', '.');
+    }
+    
+    async function saveAllData() {
+        var formData = {};
+        var b1d = getVal('b1d'), b1h = getVal('b1h'), b1m = getVal('b1m');
+        if (b1d !== '' && b1d !== '0' || b1h !== '' && b1h !== '0' || b1m !== '' && b1m !== '0')
+            formData.build1 = { day: b1d, hour: b1h, minute: b1m };
+        var b2d = getVal('b2d'), b2h = getVal('b2h'), b2m = getVal('b2m');
+        if (b2d !== '' && b2d !== '0' || b2h !== '' && b2h !== '0' || b2m !== '' && b2m !== '0')
+            formData.build2 = { day: b2d, hour: b2h, minute: b2m };
+        var b3d = getVal('b3d'), b3h = getVal('b3h'), b3m = getVal('b3m');
+        if (b3d !== '' && b3d !== '0' || b3h !== '' && b3h !== '0' || b3m !== '' && b3m !== '0')
+            formData.build3 = { day: b3d, hour: b3h, minute: b3m };
+        var r1d = getVal('r1d'), r1h = getVal('r1h'), r1m = getVal('r1m');
+        if (r1d !== '' && r1d !== '0' || r1h !== '' && r1h !== '0' || r1m !== '' && r1m !== '0')
+            formData.research1 = { day: r1d, hour: r1h, minute: r1m };
+        var r2d = getVal('r2d'), r2h = getVal('r2h'), r2m = getVal('r2m');
+        if (r2d !== '' && r2d !== '0' || r2h !== '' && r2h !== '0' || r2m !== '' && r2m !== '0')
+            formData.research2 = { day: r2d, hour: r2h, minute: r2m };
+        formData.squad1 = getVal('squad1');
+        formData.squad2 = getVal('squad2');
+        formData.squad3 = getVal('squad3');
+        formData.stationLevel = getVal('station');
+        formData.vipLevel = getVal('vip');
+        formData.relocator = getVal('relocator');
+        
+        const result = await apiCall('saveChanges', { token: TOKEN, formData: JSON.stringify(formData) });
+        if (result.success) {
+            showStatus(result.message, 'success');
+            loadQueueInfo();
+            loadRatingData();
+        } else {
+            showStatus(result.message, 'error');
+        }
+    }
+    
+    async function changeMyPassword() {
+        var p1 = document.getElementById('newPwd').value;
+        var p2 = document.getElementById('confirmPwd').value;
+        if (!p1) { showStatus('Введите пароль', 'error'); return; }
+        if (p1 !== p2) { showStatus('Пароли не совпадают', 'error'); return; }
+        if (p1.length < 4) { showStatus('Минимум 4 символа', 'error'); return; }
+        
+        const result = await apiCall('changeMyPassword', { token: TOKEN, newPassword: p1 });
+        if (result.success) {
+            showStatus(result.message, 'success');
+            document.getElementById('newPwd').value = '';
+            document.getElementById('confirmPwd').value = '';
+            if (localStorage.getItem('savedUser') === CURRENT_USER)
+                localStorage.setItem('savedPwd', p1);
+        } else {
+            showStatus(result.message, 'error');
+        }
+    }
+    
+    async function clearBuild() {
+        var target = document.getElementById('targetNick').value.trim();
+        if (!target) { showStatus('Введите ник', 'error'); return; }
+        const result = await apiCall('clearBuild', { token: TOKEN, target });
+        showStatus(result.message, result.success ? 'success' : 'error');
+        if (result.success) refreshAdminPanel();
+    }
+    
+    async function clearResearch() {
+        var target = document.getElementById('targetNick').value.trim();
+        if (!target) { showStatus('Введите ник', 'error'); return; }
+        const result = await apiCall('clearResearch', { token: TOKEN, target });
+        showStatus(result.message, result.success ? 'success' : 'error');
+        if (result.success) refreshAdminPanel();
+    }
+    
+    async function changeUserPassword() {
+        var target = document.getElementById('pwdNick').value.trim();
+        var pwd = document.getElementById('newUserPwd').value;
+        if (!target || !pwd) { showStatus('Введите ник и пароль', 'error'); return; }
+        const result = await apiCall('changePassword', { token: TOKEN, targetUsername: target, newPassword: pwd });
+        showStatus(result.message, result.success ? 'success' : 'error');
+    }
+    
+    async function replacePlayerNick() {
+        var oldN = document.getElementById('oldNick').value.trim();
+        var newN = document.getElementById('newNickName').value.trim();
+        if (!oldN || !newN) { showStatus('Введите ники', 'error'); return; }
+        const result = await apiCall('replacePlayer', { token: TOKEN, oldNick: oldN, newNick: newN });
+        showStatus(result.message, result.success ? 'success' : 'error');
+        if (result.success) { refreshAdminPanel(); loadRatingData(); loadUsersList(); }
+    }
+    
+    async function makeUserAdmin() {
+        var target = document.getElementById('adminNick').value.trim();
+        if (!target) { showStatus('Введите ник', 'error'); return; }
+        const result = await apiCall('makeAdmin', { token: TOKEN, targetUsername: target });
+        showStatus(result.message, result.success ? 'success' : 'error');
+        if (result.success) loadUsersList();
+    }
+    
+    async function removeUserAdmin() {
+        var target = document.getElementById('adminNick').value.trim();
+        if (!target) { showStatus('Введите ник', 'error'); return; }
+        const result = await apiCall('removeAdmin', { token: TOKEN, targetUsername: target });
+        showStatus(result.message, result.success ? 'success' : 'error');
+        if (result.success) loadUsersList();
+    }
+    
+    async function loadBuffTimes() {
+        const data = await apiCall('getBuffTimes');
+        if (data) {
+            document.getElementById('buildBuff').value = data.buildMinutes || 0;
+            document.getElementById('researchBuff').value = data.researchMinutes || 0;
+        }
+    }
+    
+    async function saveBuildBuffTime() {
+        var mins = document.getElementById('buildBuff').value;
+        if (mins === '') { showStatus('Введите минуты', 'error'); return; }
+        const result = await apiCall('setBuildBuffTime', { token: TOKEN, minutes: mins });
+        showStatus(result.message, result.success ? 'success' : 'error');
+        if (result.success) loadBuffTimes();
+    }
+    
+    async function saveResearchBuffTime() {
+        var mins = document.getElementById('researchBuff').value;
+        if (mins === '') { showStatus('Введите минуты', 'error'); return; }
+        const result = await apiCall('setResearchBuffTime', { token: TOKEN, minutes: mins });
+        showStatus(result.message, result.success ? 'success' : 'error');
+        if (result.success) loadBuffTimes();
+    }
+    
+    async function refreshAdminPanel() {
+        const buildTop = await apiCall('getBuildTop');
+        var html = '';
+        if (buildTop && Array.isArray(buildTop)) {
+            buildTop.forEach(item => {
+                var nick = item.nick || '-';
+                var buff = item.buff || '-';
+                if (buff !== '-') {
+                    var num = parseFloat(String(buff).replace(',', '.'));
+                    if (!isNaN(num)) buff = Math.min(Math.round(num), 12).toString();
+                }
+                html += '<div class="top-list-item"><span>' + nick + '</span><span><b>' + buff + '</b></span></div>';
+            });
+        }
+        document.getElementById('buildTop').innerHTML = html || 'Нет данных';
+        
+        const researchTop = await apiCall('getResearchTop');
+        html = '';
+        if (researchTop && Array.isArray(researchTop)) {
+            researchTop.forEach(item => {
+                var nick = item.nick || '-';
+                var buff = item.buff || '-';
+                if (buff !== '-') {
+                    var num = parseFloat(String(buff).replace(',', '.'));
+                    if (!isNaN(num)) buff = Math.min(Math.round(num), 12).toString();
+                }
+                html += '<div class="top-list-item"><span>' + nick + '</span><span><b>' + buff + '</b></span></div>';
+            });
+        }
+        document.getElementById('researchTop').innerHTML = html || 'Нет данных';
+        
+        loadAverageStats();
+    }
+    
+    async function loadRatingData() {
+        console.log('loadRatingData вызвана');
+        document.getElementById('ratingList').innerHTML = '<div style="text-align:center; padding:30px; font-size:28px;">🔄 ЗАГРУЗКА...</div>';
+        
+        const data = await apiCall('getFullRating');
+        console.log('Данные получены, количество:', data ? data.length : 0);
+        if (!data || data.length === 0) {
+            document.getElementById('ratingList').innerHTML = '<div style="text-align:center; padding:30px; font-size:28px;">Нет данных</div>';
+            return;
+        }
+        RATING_DATA = data;
+        displayRating();
+    }
+    
+    async function loadDailyLimitStatus() {
+        const enabled = await apiCall('getDailyLimitStatus');
+        document.getElementById('dailyLimitCheckbox').checked = enabled === true;
+    }
+    
+    async function toggleDailyLimit() {
+        var enabled = document.getElementById('dailyLimitCheckbox').checked;
+        const result = await apiCall('setDailyLimitEnabled', { token: TOKEN, enabled });
+        showStatus(result.message, result.success ? 'success' : 'error');
+    }
+    
+    async function loadAverageStats() {
+        const data = await apiCall('getAverageStats');
+        if (data && data.count > 0) {
+            document.getElementById('avgStation').innerText = Math.round(data.station);
+            document.getElementById('avgRelocator').innerText = Math.round(data.relocator);
+            document.getElementById('avgVip').innerText = Math.round(data.vip);
+            document.getElementById('avgSquad1').innerText = data.squad1.toFixed(1);
+            document.getElementById('avgSquad2').innerText = data.squad2.toFixed(1);
+            document.getElementById('avgSquad3').innerText = data.squad3.toFixed(1);
+            document.getElementById('avgCount').innerText = data.count;
+        } else {
+            document.getElementById('avgStation').innerText = 'Нет данных';
+            document.getElementById('avgRelocator').innerText = 'Нет данных';
+            document.getElementById('avgVip').innerText = 'Нет данных';
+            document.getElementById('avgSquad1').innerText = 'Нет данных';
+            document.getElementById('avgSquad2').innerText = 'Нет данных';
+            document.getElementById('avgSquad3').innerText = 'Нет данных';
+            document.getElementById('avgCount').innerText = '0';
+        }
+    }
+    
+    function displayRating() {
+        if (!RATING_DATA) return;
+        var sorted = [...RATING_DATA];
+        
+        if (CURRENT_SORT === 'squad1') sorted.sort((a,b) => (Number(b.squad1)||0) - (Number(a.squad1)||0));
+        else if (CURRENT_SORT === 'squad2') sorted.sort((a,b) => (Number(b.squad2)||0) - (Number(a.squad2)||0));
+        else if (CURRENT_SORT === 'squad3') sorted.sort((a,b) => (Number(b.squad3)||0) - (Number(a.squad3)||0));
+        else if (CURRENT_SORT === 'station') sorted.sort((a,b) => (Number(b.station)||0) - (Number(a.station)||0));
+        else if (CURRENT_SORT === 'vip') sorted.sort((a,b) => (Number(b.vip)||0) - (Number(a.vip)||0));
+        else if (CURRENT_SORT === 'relocator') sorted.sort((a,b) => (Number(b.relocator)||0) - (Number(a.relocator)||0));
+        
+        var names = {
+            squad1: 'ОТРЯД 1 (млн)',
+            squad2: 'ОТРЯД 2 (млн)',
+            squad3: 'ОТРЯД 3 (млн)',
+            station: 'ЭЛЕКТРОСТАНЦИЯ',
+            vip: 'VIP УРОВЕНЬ',
+            relocator: 'РЕЛОКАТОРЫ'
+        };
+        
+        function formatValue(val) {
+            if (typeof val !== 'number') return val;
+            if (Math.floor(val) === val) return val.toString();
+            return val.toFixed(2);
+        }
+        
+        var html = '<table class="rating-table"><thead><tr><th>#</th><th>НИК</th><th>' + names[CURRENT_SORT] + '</th></tr></thead><tbody>';
+        for (var i = 0; i < sorted.length; i++) {
+            var val = sorted[i][CURRENT_SORT] || 0;
+            html += '<tr>';
+            html += '<td style="padding: 12px 8px; font-weight: bold;">' + (i+1) + '</td>';
+            html += '<td style="padding: 12px 8px; font-weight: bold;">' + (sorted[i].nick || '-') + '</td>';
+            html += '<td style="padding: 12px 8px; font-weight: bold;">' + formatValue(val) + '</td>';
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        document.getElementById('ratingList').innerHTML = html;
+    }
+    
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.onclick = function() {
+            CURRENT_SORT = this.dataset.sort;
+            displayRating();
+            document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        };
+    });
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById(this.dataset.tab).classList.add('active');
+        };
+    });
+    
+    async function doLogout() {
+        if (autoInterval) clearInterval(autoInterval);
+        await apiCall('logout', { token: TOKEN });
+        TOKEN = null;
+        document.getElementById('mainScreen').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'block';
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
+    }
+    
+    function installApp() {
+        alert('📱 УСТАНОВКА:\n\n1. Нажмите ⋮ (три точки справа вверху)\n2. Выберите "Добавить на главный экран"\n3. Нажмите "Добавить"');
+    }
+    
+    setTimeout(function() {
+        var btn = document.getElementById('installBtn');
+        if (btn) {
+            btn.style.display = 'block';
+            btn.style.background = '#10b981';
+        }
+    }, 1000);
+</script>
+
+<div style="text-align: center; margin-top: 20px; padding: 10px;">
+    <button id="installBtn" class="btn btn-blue" style="display: none; background: #10b981;" onclick="installApp()">📱 КАК УСТАНОВИТЬ ПРИЛОЖЕНИЕ</button>
+</div>
+
 </body>
 </html>
